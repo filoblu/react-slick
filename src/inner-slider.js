@@ -103,6 +103,10 @@ export class InnerSlider extends React.Component {
     }
     if (window.addEventListener) {
       window.addEventListener("resize", this.onWindowResized);
+      window.addEventListener("touchstart", this.touchStart);
+      window.addEventListener("touchmove", this.preventTouch, {
+        passive: false
+      });
     } else {
       window.attachEvent("onresize", this.onWindowResized);
     }
@@ -120,6 +124,10 @@ export class InnerSlider extends React.Component {
     }
     if (window.addEventListener) {
       window.removeEventListener("resize", this.onWindowResized);
+      window.removeEventListener("touchstart", this.touchStart);
+      window.removeEventListener("touchmove", this.preventTouch, {
+        passive: false
+      });
     } else {
       window.detachEvent("onresize", this.onWindowResized);
     }
@@ -127,6 +135,26 @@ export class InnerSlider extends React.Component {
       clearInterval(this.autoplayTimer);
     }
   };
+
+  touchStart(e) {
+    this.firstClientX = e.touches[0].clientX;
+    this.firstClientY = e.touches[0].clientY;
+  }
+
+  preventTouch(e) {
+    const minValue = 5; // threshold
+
+    this.clientX = e.touches[0].clientX - this.firstClientX;
+    this.clientY = e.touches[0].clientY - this.firstClientY;
+
+    // Vertical scrolling does not work when you start swiping horizontally.
+    if (Math.abs(this.clientX) > minValue) {
+      e.preventDefault();
+      e.returnValue = false;
+      return false;
+    }
+  }
+
   UNSAFE_componentWillReceiveProps = nextProps => {
     let spec = {
       listRef: this.list,
@@ -709,7 +737,7 @@ export class InnerSlider extends React.Component {
     let innerSliderProps = {
       className: className,
       dir: "ltr",
-      style:this.props.style
+      style: this.props.style
     };
 
     if (this.props.unslick) {
