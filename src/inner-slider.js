@@ -149,7 +149,9 @@ export class InnerSlider extends React.Component {
 
     // Vertical scrolling does not work when you start swiping horizontally.
     if (Math.abs(this.clientX) > minValue) {
-      e.preventDefault();
+      if (e.cancelable) {
+        e.preventDefault();
+      }
       e.returnValue = false;
       return false;
     }
