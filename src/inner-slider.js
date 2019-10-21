@@ -151,8 +151,8 @@ export class InnerSlider extends React.Component {
     if (Math.abs(this.clientX) > minValue) {
       if (e.cancelable) {
         e.preventDefault();
+        e.returnValue = false;
       }
-      e.returnValue = false;
       return false;
     }
   }
